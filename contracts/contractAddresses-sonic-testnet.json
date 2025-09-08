@@ -1,9 +1,9 @@
 {
-  "HemDealer": "0xde609E52D9164C227D4F174D6260289bc3E62eC2",
-  "HemDealerCrossChain": "0xe66dd4f6A29ab1843A39Df47f0D0f9e46F3B858f",
-  "AcrossRouter": "0xde609E52D9164C227D4F174D6260289bc3E62eC2",
+  "HemDealer": "0xA3ce6131fD8FA3201Ed27aCa73745E3746b8Df89",
+  "HemDealerCrossChain": "0xd6aED2D75f9d00a0Af587B83486ffDEF75B489AC",
+  "AcrossRouter": "0xA3ce6131fD8FA3201Ed27aCa73745E3746b8Df89",
   "deployer": "0x3F5b96A494061F7338Da529e3047809Ac6a7FB84",
   "network": "sonicTestnet",
   "chainId": 64165,
-  "deployedAt": "2025-09-07T21:09:19.461Z"
+  "deployedAt": "2025-09-08T10:35:46.709Z"
 }

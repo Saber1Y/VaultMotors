@@ -27,7 +27,7 @@ async function main() {
   // In production, these would be real Across Protocol addresses
   const spokePoolAddress = hemDealerAddress // Placeholder - will be updated with real Across address
   const acrossRouterAddress = hemDealerAddress // Placeholder - will be updated with real Across address
-  
+
   console.log('Note: Using placeholder addresses for Across Protocol integration')
   console.log('SpokePool placeholder:', spokePoolAddress)
   console.log('Router placeholder:', acrossRouterAddress)
