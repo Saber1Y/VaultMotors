@@ -16,19 +16,66 @@ let cachedChainId: number | null = null
 if (typeof window !== 'undefined') ethereum = (window as any).ethereum
 
 const getChainConfig = (chainId: number) => {
-  const config = chainConfig.sepolia
-  if (config.chainId !== chainId) {
-    throw new Error(`Unsupported chain. Only Sepolia (${config.chainId}) is supported.`)
+  // Support both Sepolia and Sonic networks
+  if (chainId === 11155111) {
+    return {
+      chainId: 11155111,
+      name: 'Sepolia',
+      rpcUrl: process.env.SEPOLIA_RPC_URL || 'https://sepolia.infura.io/v3/demo',
+      contracts: {
+        HemDealer: process.env.NEXT_PUBLIC_SEPOLIA_HEMDEALER_ADDRESS || '',
+        HemDealerCrossChain: process.env.NEXT_PUBLIC_SEPOLIA_CROSSCHAIN_ADDRESS || '',
+        AcrossRouter: process.env.NEXT_PUBLIC_SEPOLIA_ACROSS_ADDRESS || '',
+      },
+      explorer: 'https://sepolia.etherscan.io',
+    }
   }
-  return config
+
+  // Sonic Testnet (chain ID 14601)
+  if (chainId === 14601) {
+    return {
+      chainId: 14601,
+      name: 'Sonic Testnet',
+      rpcUrl: 'https://rpc.testnet.soniclabs.com',
+      contracts: {
+        HemDealer: process.env.NEXT_PUBLIC_SONIC_TESTNET_HEMDEALER_ADDRESS || '',
+        HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_TESTNET_CROSSCHAIN_ADDRESS || '',
+        AcrossRouter: process.env.NEXT_PUBLIC_SONIC_TESTNET_ACROSS_ADDRESS || '',
+      },
+      explorer: 'https://testnet.soniclabs.com',
+    }
+  }
+
+  // Default to Sonic Testnet if unknown chain ID
+  return {
+    chainId: 14601,
+    name: 'Sonic Testnet',
+    rpcUrl: 'https://rpc.testnet.soniclabs.com',
+    contracts: {
+      HemDealer: process.env.NEXT_PUBLIC_SONIC_TESTNET_HEMDEALER_ADDRESS || '',
+      HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_TESTNET_CROSSCHAIN_ADDRESS || '',
+      AcrossRouter: process.env.NEXT_PUBLIC_SONIC_TESTNET_ACROSS_ADDRESS || '',
+    },
+    explorer: 'https://testnet.soniclabs.com',
+  }
 }
 
 const getEthereumContract = async (chainId?: number) => {
   try {
-    // If no ethereum object, use read-only provider
+    // If no ethereum object, use read-only provider for Sonic Testnet (where we deployed)
     if (!ethereum) {
-      console.warn('No wallet provider detected. Using read-only provider.')
-      const config = chainConfig.sepolia
+      console.warn('No wallet provider detected. Using read-only Sonic Testnet provider.')
+      const config = {
+        chainId: 14601,
+        name: 'Sonic Testnet',
+        rpcUrl: 'https://rpc.testnet.soniclabs.com',
+        contracts: {
+          HemDealer: process.env.NEXT_PUBLIC_SONIC_TESTNET_HEMDEALER_ADDRESS || '',
+          HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_TESTNET_CROSSCHAIN_ADDRESS || '',
+          AcrossRouter: process.env.NEXT_PUBLIC_SONIC_TESTNET_ACROSS_ADDRESS || '',
+        },
+        explorer: 'https://testnet.soniclabs.com',
+      }
       const provider = new ethers.JsonRpcProvider(config.rpcUrl)
       return new ethers.Contract(config.contracts.HemDealer, abi.abi, provider)
     }
@@ -256,13 +303,59 @@ const getCar = async (carId: number): Promise<CarStruct | null> => {
 
 const getAllCars = async (): Promise<CarStruct[]> => {
   try {
-    const config = chainConfig.sepolia
+    // Use environment variable to switch networks for testing
+    const testNetwork = process.env.NEXT_PUBLIC_TEST_NETWORK || 'sonic'
+    
+    let config
+    if (testNetwork === 'sepolia') {
+      config = {
+        chainId: 11155111,
+        name: 'Sepolia',
+        rpcUrl: 'https://sepolia.infura.io/v3/b26f468efd8b4ec299c070e46c280a9c',
+        contracts: {
+          HemDealer: process.env.NEXT_PUBLIC_SEPOLIA_HEMDEALER_ADDRESS || '',
+          HemDealerCrossChain: process.env.NEXT_PUBLIC_SEPOLIA_CROSSCHAIN_ADDRESS || '',
+          AcrossRouter: process.env.NEXT_PUBLIC_SEPOLIA_ACROSS_ADDRESS || '',
+        },
+        explorer: 'https://sepolia.etherscan.io',
+      }
+    } else {
+      // Default to Sonic Testnet
+      config = {
+        chainId: 14601,
+        name: 'Sonic Testnet',
+        rpcUrl: 'https://rpc.testnet.soniclabs.com',
+        contracts: {
+          HemDealer: process.env.NEXT_PUBLIC_SONIC_TESTNET_HEMDEALER_ADDRESS || '',
+          HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_TESTNET_CROSSCHAIN_ADDRESS || '',
+          AcrossRouter: process.env.NEXT_PUBLIC_SONIC_TESTNET_ACROSS_ADDRESS || '',
+        },
+        explorer: 'https://testnet.soniclabs.com',
+      }
+    }
+
+    console.log('🔧 Test Network Mode:', testNetwork.toUpperCase())
+    console.log('Using config for chain:', config.name, config.chainId)
+    console.log('Contract address:', config.contracts.HemDealer)
+    console.log('RPC URL:', config.rpcUrl)
+
+    if (!config.contracts.HemDealer) {
+      throw new Error('Contract address not found in environment variables')
+    }
+
     const provider = new ethers.JsonRpcProvider(config.rpcUrl)
+
+    // First check if contract exists
+    const code = await provider.getCode(config.contracts.HemDealer)
+    if (code === '0x') {
+      throw new Error(`Contract not found at address ${config.contracts.HemDealer}`)
+    }
+
     const contract = new ethers.Contract(config.contracts.HemDealer, abi.abi, provider)
 
     const cars: CarStruct[] = await contract.getAllCars()
 
-    console.log('Fetched Cars (Fallback Method):', cars)
+    console.log('Fetched Cars:', cars)
     return cars
   } catch (error) {
     console.error('Error fetching cars:', error)
@@ -290,14 +383,16 @@ const getAllSales = async (): Promise<SalesStruct[]> => {
       return []
     }
     const salesData = await contract.getAllSales()
-    
+
     console.log('Raw sales data from contract:', salesData)
-    const validSales = salesData.map((sale: any) => ({
-      id: Number(sale.id || 0),
-      newCarId: Number(sale.newCarId || 0),
-      price: sale.price ? BigInt(sale.price.toString()) : BigInt(0),
-      owner: sale.owner || ''
-    })).filter((sale: SalesStruct) => sale.newCarId > 0)
+    const validSales = salesData
+      .map((sale: any) => ({
+        id: Number(sale.id || 0),
+        newCarId: Number(sale.newCarId || 0),
+        price: sale.price ? BigInt(sale.price.toString()) : BigInt(0),
+        owner: sale.owner || '',
+      }))
+      .filter((sale: SalesStruct) => sale.newCarId > 0)
 
     console.log('Processed sales data:', validSales)
 

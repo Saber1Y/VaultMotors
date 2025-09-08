@@ -47,8 +47,8 @@ const sonicTestnet = {
 }
 
 const { chains, publicClient } = configureChains(
-  [sonicTestnet, sonic], // Sonic first for hackathon focus
-  [publicProvider()] // Remove Alchemy dependency for pure Sonic
+  [sepolia, sonicTestnet, sonic], // Include Sepolia for cross-chain testing
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID as string }), publicProvider()]
 )
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string

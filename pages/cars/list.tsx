@@ -6,7 +6,7 @@ import { FaPlus, FaTimes, FaUser, FaCamera, FaEthereum, FaCar } from 'react-icon
 import Image from 'next/image'
 import { CarCondition, CarTransmission, FuelType, CarParams } from '@/utils/type.dt'
 import { listCar } from '@/services/blockchain'
-import { ethers, parseEther } from 'ethers'
+import { ethers } from 'ethers'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
 
@@ -81,24 +81,24 @@ const ListCarPage = () => {
 
   const handleAddFeature = () => {
     if (featureInput.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         additionalInfo: {
           ...prev.additionalInfo,
-          features: [...prev.additionalInfo.features, featureInput.trim()]
-        }
+          features: [...prev.additionalInfo.features, featureInput.trim()],
+        },
       }))
       setFeatureInput('')
     }
   }
 
   const handleRemoveFeature = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       additionalInfo: {
         ...prev.additionalInfo,
-        features: prev.additionalInfo.features.filter((_, i) => i !== index)
-      }
+        features: prev.additionalInfo.features.filter((_, i) => i !== index),
+      },
     }))
   }
 
@@ -111,6 +111,7 @@ const ListCarPage = () => {
 
     setLoading(true)
     try {
+      // Ensure seller wallet is the connected address
       const formDataToSubmit = {
         ...formData,
         basicDetails: {
@@ -120,9 +121,16 @@ const ListCarPage = () => {
         technicalDetails: {
           ...formData.technicalDetails,
           price: formData.technicalDetails.price.toString(),
-        }
+        },
+        sellerDetails: {
+          ...formData.sellerDetails,
+          wallet: address || '', // Always use connected wallet
+        },
+        destinationChainId: 11155111, // Sepolia chain ID
+        paymentToken: ethers.ZeroAddress, // Use ethers.ZeroAddress instead of string
       }
 
+      console.log('Submitting car data:', formDataToSubmit)
       await listCar(formDataToSubmit as CarParams)
       toast.success('Car listed successfully!')
       router.push('/cars')
@@ -152,12 +160,11 @@ const ListCarPage = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white">List Your Car</h1>
-            <p className="text-gray-400 mt-2">Fill in the details to list your car on the marketplace</p>
+            <p className="text-gray-400 mt-2">
+              Fill in the details to list your car on the marketplace
+            </p>
           </div>
-          <Link
-            href="/cars"
-            className="text-purple-400 hover:text-purple-300 transition-colors"
-          >
+          <Link href="/cars" className="text-purple-400 hover:text-purple-300 transition-colors">
             Back to Cars
           </Link>
         </div>
@@ -196,10 +203,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.name}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, name: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, name: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter vehicle name"
                   required
@@ -211,10 +220,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.make}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, make: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, make: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter make"
                   required
@@ -226,10 +237,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.model}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, model: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, model: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter model"
                   required
@@ -241,10 +254,12 @@ const ListCarPage = () => {
                 <input
                   type="number"
                   value={formData.basicDetails.year}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, year: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, year: Number(e.target.value) },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter year"
                   required
@@ -256,10 +271,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.vin}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, vin: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, vin: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter VIN"
                   required
@@ -270,10 +287,12 @@ const ListCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
                 <textarea
                   value={formData.basicDetails.description}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    basicDetails: { ...prev.basicDetails, description: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      basicDetails: { ...prev.basicDetails, description: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white h-32"
                   placeholder="Enter vehicle description"
                   required
@@ -335,10 +354,12 @@ const ListCarPage = () => {
                   type="number"
                   step="0.001"
                   value={formData.technicalDetails.price.toString()}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, price: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: { ...prev.technicalDetails, price: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter price in ETH"
                   min="0.001"
@@ -351,10 +372,15 @@ const ListCarPage = () => {
                 <input
                   type="number"
                   value={formData.technicalDetails.mileage}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, mileage: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: {
+                        ...prev.technicalDetails,
+                        mileage: Number(e.target.value),
+                      },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter mileage"
                   required
@@ -366,10 +392,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.technicalDetails.color}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, color: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: { ...prev.technicalDetails, color: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter color"
                   required
@@ -380,10 +408,15 @@ const ListCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Condition</label>
                 <select
                   value={formData.technicalDetails.condition}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, condition: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: {
+                        ...prev.technicalDetails,
+                        condition: Number(e.target.value),
+                      },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   required
                 >
@@ -397,10 +430,15 @@ const ListCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Transmission</label>
                 <select
                   value={formData.technicalDetails.transmission}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, transmission: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: {
+                        ...prev.technicalDetails,
+                        transmission: Number(e.target.value),
+                      },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   required
                 >
@@ -413,10 +451,15 @@ const ListCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Fuel Type</label>
                 <select
                   value={formData.technicalDetails.fuelType}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    technicalDetails: { ...prev.technicalDetails, fuelType: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      technicalDetails: {
+                        ...prev.technicalDetails,
+                        fuelType: Number(e.target.value),
+                      },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   required
                 >
@@ -441,10 +484,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.additionalInfo.location}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    additionalInfo: { ...prev.additionalInfo, location: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      additionalInfo: { ...prev.additionalInfo, location: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter location"
                   required
@@ -502,10 +547,12 @@ const ListCarPage = () => {
                 <input
                   type="text"
                   value={formData.sellerDetails.sellerName}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    sellerDetails: { ...prev.sellerDetails, sellerName: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      sellerDetails: { ...prev.sellerDetails, sellerName: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your name"
                   required
@@ -517,10 +564,12 @@ const ListCarPage = () => {
                 <input
                   type="email"
                   value={formData.sellerDetails.email}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    sellerDetails: { ...prev.sellerDetails, email: e.target.value }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      sellerDetails: { ...prev.sellerDetails, email: e.target.value },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your email"
                   required
@@ -532,10 +581,12 @@ const ListCarPage = () => {
                 <input
                   type="tel"
                   value={formData.sellerDetails.phoneNumber}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    sellerDetails: { ...prev.sellerDetails, phoneNumber: Number(e.target.value) }
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      sellerDetails: { ...prev.sellerDetails, phoneNumber: Number(e.target.value) },
+                    }))
+                  }
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your phone number"
                   required
@@ -543,7 +594,9 @@ const ListCarPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Wallet Address</label>
+                <label className="block text-sm font-medium text-gray-400 mb-2">
+                  Wallet Address
+                </label>
                 <input
                   type="text"
                   value={formData.sellerDetails.wallet}

@@ -1,0 +1,1 @@
+cd /Users/USER/codes/Cardealership && node scripts/check-network.js
