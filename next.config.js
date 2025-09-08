@@ -41,6 +41,12 @@ const nextConfig = {
         loader: 'ignore-loader',
       })
 
+      // Ignore WS module issues in browser
+      config.module.rules.push({
+        test: /node_modules\/ws\/(lib\/buffer-util\.js|lib\/validation\.js)$/,
+        loader: 'ignore-loader',
+      })
+
       // Add webpack plugins to provide global variables
       const webpack = require('webpack')
       config.plugins.push(

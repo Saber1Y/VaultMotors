@@ -9,8 +9,6 @@ const Hero = () => {
 
   return (
     <div className="relative min-h-screen">
-      
-
       <div className="relative z-10 pt-24 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -40,7 +38,7 @@ const Hero = () => {
                 Browse Cars
               </Link>
               <Link
-                href="/list"
+                href="/cars/list"
                 className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-lg text-purple-400 border-2 border-purple-400/30 hover:border-purple-400 hover:bg-purple-400/10 transition-all duration-300"
               >
                 <FaCar className="mr-2" />

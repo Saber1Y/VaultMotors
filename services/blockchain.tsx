@@ -8,7 +8,6 @@ const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: number) => ethers.formatEther(num)
 
 let ethereum: any
-let tx: any
 let cachedProvider: ethers.BrowserProvider | null = null
 let cachedContract: ethers.Contract | null = null
 let cachedChainId: number | null = null
@@ -235,7 +234,7 @@ const listCar = async (car: CarParams): Promise<void> => {
       )
       .catch(() => BigInt(500000))
 
-    tx = await contract.listCar(
+    const tx = await contract.listCar(
       formattedCar.basicDetails,
       formattedCar.technicalDetails,
       formattedCar.additionalInfo,
@@ -274,22 +273,50 @@ const updateCar = async (carId: number, car: CarParams): Promise<void> => {
     const contract = await getEthereumContract()
     const gasPrice = await cachedProvider?.getFeeData()
 
+    // Create deep copies to avoid immutability issues
+    const basicDetails = {
+      name: car.basicDetails.name,
+      images: [...car.basicDetails.images],
+      description: car.basicDetails.description,
+      make: car.basicDetails.make,
+      model: car.basicDetails.model,
+      year: car.basicDetails.year,
+      vin: car.basicDetails.vin,
+    }
+
+    const technicalDetails = {
+      mileage: car.technicalDetails.mileage,
+      color: car.technicalDetails.color,
+      condition: car.technicalDetails.condition,
+      transmission: car.technicalDetails.transmission,
+      fuelType: car.technicalDetails.fuelType,
+      price: car.technicalDetails.price,
+    }
+
+    const additionalInfo = {
+      location: car.additionalInfo.location,
+      carHistory: car.additionalInfo.carHistory || '',
+      features: [...car.additionalInfo.features],
+    }
+
+    const sellerDetails = {
+      wallet: car.sellerDetails.wallet,
+      sellerName: car.sellerDetails.sellerName,
+      email: car.sellerDetails.email,
+      phoneNumber: car.sellerDetails.phoneNumber,
+      profileImage: car.sellerDetails.profileImage,
+    }
+
     const gasLimit = await contract.updateCar
-      .estimateGas(
-        carId,
-        car.basicDetails,
-        car.technicalDetails,
-        car.additionalInfo,
-        car.sellerDetails
-      )
+      .estimateGas(carId, basicDetails, technicalDetails, additionalInfo, sellerDetails)
       .catch(() => BigInt(400000))
 
-    tx = await contract.updateCar(
+    const transaction = await contract.updateCar(
       carId,
-      car.basicDetails,
-      car.technicalDetails,
-      car.additionalInfo,
-      car.sellerDetails,
+      basicDetails,
+      technicalDetails,
+      additionalInfo,
+      sellerDetails,
       {
         gasLimit: gasLimit,
         maxFeePerGas: gasPrice?.maxFeePerGas || undefined,
@@ -297,8 +324,8 @@ const updateCar = async (carId: number, car: CarParams): Promise<void> => {
       }
     )
 
-    await tx.wait()
-    return Promise.resolve(tx)
+    await transaction.wait()
+    return Promise.resolve(transaction)
   } catch (error) {
     reportError(error)
     return Promise.reject(error)
@@ -317,7 +344,7 @@ const deleteCar = async (carId: number): Promise<void> => {
     const gasLimit = await contract.deleteCar.estimateGas(carId).catch(() => BigInt(300000))
     const gasPrice = await cachedProvider?.getFeeData()
 
-    tx = await contract.deleteCar(carId, {
+    const tx = await contract.deleteCar(carId, {
       gasLimit: gasLimit,
       maxFeePerGas: gasPrice?.maxFeePerGas || undefined,
       maxPriorityFeePerGas: gasPrice?.maxPriorityFeePerGas || undefined,
@@ -334,8 +361,8 @@ const deleteCar = async (carId: number): Promise<void> => {
 const getCar = async (carId: number): Promise<CarStruct | null> => {
   try {
     const contract = await getEthereumContract()
-    tx = await contract.getCar(carId)
-    return Promise.resolve(tx)
+    const car = await contract.getCar(carId)
+    return Promise.resolve(car)
   } catch (error: any) {
     if (error?.reason === 'Car has been deleted') {
       return Promise.resolve(null)
@@ -410,8 +437,8 @@ const getAllCars = async (): Promise<CarStruct[]> => {
 const getMyCars = async (): Promise<CarStruct[]> => {
   try {
     const contract = await getEthereumContract()
-    tx = await contract.getMyCars()
-    return Promise.resolve(tx)
+    const cars = await contract.getMyCars()
+    return Promise.resolve(cars)
   } catch (error) {
     reportError(error)
     return Promise.reject(error)
@@ -461,6 +488,8 @@ const buyCar = async (carId: number): Promise<void> => {
     const chainId = await ethereum.request({ method: 'eth_chainId' })
     const currentChainId = parseInt(chainId as string, 16)
 
+    let resultTx: any
+
     if (car.destinationChainId !== currentChainId) {
       // Cross-chain purchase
       const crossChainContract = await getCrossChainContract()
@@ -482,7 +511,7 @@ const buyCar = async (carId: number): Promise<void> => {
         )
         .catch(() => BigInt(350000))
 
-      tx = await crossChainContract.bridgePayment(
+      const tx = await crossChainContract.bridgePayment(
         totalAmount,
         car.seller.wallet,
         car.destinationChainId,
@@ -504,7 +533,7 @@ const buyCar = async (carId: number): Promise<void> => {
         })
         .catch(() => BigInt(450000))
 
-      tx = await crossChainContract.initiateCrossChainTransfer(
+      resultTx = await crossChainContract.initiateCrossChainTransfer(
         carId,
         car.destinationChainId,
         quote.relayerFeePct,
@@ -527,7 +556,7 @@ const buyCar = async (carId: number): Promise<void> => {
         )
         .catch(() => BigInt(350000))
 
-      tx = await contract.buyCar(carId, 0, Math.floor(Date.now() / 1000), {
+      resultTx = await contract.buyCar(carId, 0, Math.floor(Date.now() / 1000), {
         value: car.price,
         gasLimit: gasLimit,
         maxFeePerGas: gasPrice?.maxFeePerGas || undefined,
@@ -535,8 +564,8 @@ const buyCar = async (carId: number): Promise<void> => {
       })
     }
 
-    await tx.wait()
-    return Promise.resolve(tx)
+    await resultTx.wait()
+    return Promise.resolve(resultTx)
   } catch (error) {
     reportError(error)
     return Promise.reject(error)
@@ -553,6 +582,9 @@ const initiateCrossChainTransfer = async (
   }
 
   try {
+    let transferTx: any
+    let sonicTx: any
+
     const currentChainIdHex = await ethereum.request({ method: 'eth_chainId' })
     const currentChainId = parseInt(currentChainIdHex as string, 16)
 
@@ -578,7 +610,7 @@ const initiateCrossChainTransfer = async (
       const transferAmount = ethers.parseEther('0.001') // Small amount for testing
       console.log('💸 Transfer amount:', ethers.formatEther(transferAmount), 'ETH')
 
-      tx = await contract.initiateCrossChainTransfer(
+      transferTx = await contract.initiateCrossChainTransfer(
         carId,
         destinationChainId,
         quote.relayerFeePct,
@@ -604,7 +636,7 @@ const initiateCrossChainTransfer = async (
 
       // Use the main HemDealer contract's buyCar function instead
       // This simulates the cross-chain transfer completion
-      tx = await mainContract.buyCar(
+      sonicTx = await mainContract.buyCar(
         carId,
         Math.floor(quote.relayerFeePct * 10000), // Convert to basis points
         quote.quoteTimestamp,
@@ -618,13 +650,14 @@ const initiateCrossChainTransfer = async (
       throw new Error(`Unsupported chain for cross-chain transfer: ${currentChainId}`)
     }
 
+    const finalTx = transferTx || sonicTx
     console.log('⏳ Waiting for transaction confirmation...')
-    await tx.wait()
+    await finalTx.wait()
 
     console.log('✅ Cross-chain transfer completed successfully!')
-    console.log('🔗 Transaction hash:', tx.hash)
+    console.log('🔗 Transaction hash:', finalTx.hash)
 
-    return Promise.resolve(tx)
+    return Promise.resolve(finalTx)
   } catch (error) {
     console.error('❌ Cross-chain transfer failed:', error)
     reportError(error)
@@ -646,11 +679,17 @@ const bridgePayment = async (
   try {
     const contract = await getCrossChainContract()
     const value = token === ethers.ZeroAddress ? toWei(amount) : 0
-    tx = await contract.bridgePayment(token, toWei(amount), recipient, destinationChainId, {
-      value,
-    })
-    await tx.wait()
-    return Promise.resolve(tx)
+    const bridgeTx = await contract.bridgePayment(
+      token,
+      toWei(amount),
+      recipient,
+      destinationChainId,
+      {
+        value,
+      }
+    )
+    await bridgeTx.wait()
+    return Promise.resolve(bridgeTx)
   } catch (error) {
     reportError(error)
     return Promise.reject(error)
@@ -743,14 +782,14 @@ const cancelTimedOutTransfer = async (carId: number): Promise<void> => {
       .estimateGas(carId)
       .catch(() => BigInt(300000))
 
-    tx = await crossChainContract.cancelTimedOutTransfer(carId, {
+    const cancelTx = await crossChainContract.cancelTimedOutTransfer(carId, {
       gasLimit: gasLimit,
       maxFeePerGas: gasPrice?.maxFeePerGas || undefined,
       maxPriorityFeePerGas: gasPrice?.maxPriorityFeePerGas || undefined,
     })
 
-    await tx.wait()
-    return Promise.resolve(tx)
+    await cancelTx.wait()
+    return Promise.resolve(cancelTx)
   } catch (error) {
     reportError(error)
     return Promise.reject(error)
