@@ -19,7 +19,7 @@ export const chainConfig = {
       HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_CROSSCHAIN_ADDRESS || '',
       AcrossRouter: process.env.NEXT_PUBLIC_SONIC_ACROSS_ADDRESS || '',
     },
-    explorer: 'https://soniclabs.com',
+    explorer: 'https://sonicscan.org',
     nativeCurrency: {
       name: 'Sonic',
       symbol: 'S',
@@ -27,9 +27,9 @@ export const chainConfig = {
     },
   },
   sonicTestnet: {
-    chainId: 64165, // Sonic Testnet
+    chainId: 14601, // Correct Sonic Testnet Chain ID
     name: 'Sonic Testnet',
-    rpcUrl: 'https://rpc.blaze.soniclabs.com',
+    rpcUrl: 'https://rpc.testnet.soniclabs.com', // Correct Sonic Testnet RPC
     contracts: {
       HemDealer: process.env.NEXT_PUBLIC_SONIC_TESTNET_HEMDEALER_ADDRESS || '',
       HemDealerCrossChain: process.env.NEXT_PUBLIC_SONIC_TESTNET_CROSSCHAIN_ADDRESS || '',

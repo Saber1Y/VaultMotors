@@ -14,7 +14,7 @@ async function main() {
   // Deploy HemDealer first
   const HemDealer = await ethers.getContractFactory('HemDealer')
   console.log('Deploying HemDealer to Sonic Testnet...')
-  const hemDealer = await HemDealer.deploy()
+  const hemDealer = await HemDealer.deploy('VaultMotors', 'VAULT')
   await hemDealer.waitForDeployment()
   const hemDealerAddress = await hemDealer.getAddress()
   console.log('HemDealer deployed to:', hemDealerAddress)
@@ -23,9 +23,14 @@ async function main() {
   const HemDealerCrossChain = await ethers.getContractFactory('HemDealerCrossChain')
   console.log('Deploying HemDealerCrossChain...')
 
-  // Sonic testnet addresses (placeholders - update with real addresses when available)
-  const spokePoolAddress = '0x0000000000000000000000000000000000000000'
-  const acrossRouterAddress = '0x0000000000000000000000000000000000000000'
+  // For hackathon demo: Use the main contract address as placeholder
+  // In production, these would be real Across Protocol addresses
+  const spokePoolAddress = hemDealerAddress // Placeholder - will be updated with real Across address
+  const acrossRouterAddress = hemDealerAddress // Placeholder - will be updated with real Across address
+  
+  console.log('Note: Using placeholder addresses for Across Protocol integration')
+  console.log('SpokePool placeholder:', spokePoolAddress)
+  console.log('Router placeholder:', acrossRouterAddress)
 
   const hemDealerCrossChain = await HemDealerCrossChain.deploy(
     hemDealerAddress,

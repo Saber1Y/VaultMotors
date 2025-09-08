@@ -24,11 +24,47 @@ const nextConfig = {
         assert: require.resolve('assert'),
         os: require.resolve('os-browserify/browser'),
         path: require.resolve('path-browserify'),
+        // Add more polyfills for WalletConnect
+        buffer: require.resolve('buffer'),
+        process: require.resolve('process/browser'),
       }
+
+      // Ignore node-gyp-build warnings
+      config.module.rules.push({
+        test: /node_modules\/node-gyp-build\/index\.js$/,
+        loader: 'null-loader',
+      })
+
+      // Suppress critical dependency warnings for specific modules
+      config.module.rules.push({
+        test: /node_modules\/(bufferutil|utf-8-validate)/,
+        loader: 'ignore-loader',
+      })
+
+      // Add webpack plugins to provide global variables
+      const webpack = require('webpack')
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          process: 'process/browser',
+        })
+      )
+
+      // Ignore warnings for node-gyp-build
+      config.ignoreWarnings = [
+        /Critical dependency: require function is used in a way in which dependencies cannot be statically extracted/,
+        /Module not found: Can't resolve 'bufferutil'/,
+        /Module not found: Can't resolve 'utf-8-validate'/,
+      ]
     }
     return config
   },
   transpilePackages: ['@walletconnect/legacy-client', '@walletconnect/legacy-provider'],
+  // Suppress warnings during build
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
 }
 
 module.exports = nextConfig

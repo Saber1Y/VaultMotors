@@ -5,25 +5,25 @@ module.exports = {
   defaultNetwork: 'sonicTestnet',
   networks: {
     sepolia: {
-      url: process.env.NEXT_PUBLIC_RPC_URL,
-      accounts: [process.env.PRIVATE_KEY],
+      url: process.env.SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/demo',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     polygon_amoy: {
-      url: process.env.POLYGON_RPC_URL,
-      accounts: [process.env.PRIVATE_KEY],
+      url: process.env.POLYGON_RPC_URL || 'https://polygon-mainnet.g.alchemy.com/v2/demo',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 80002,
     },
     sonic: {
       url: 'https://rpc.soniclabs.com',
-      accounts: [process.env.PRIVATE_KEY],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 146,
       gasPrice: 1000000000, // 1 gwei - Sonic's low gas fees
     },
     sonicTestnet: {
-      url: 'https://rpc.blaze.soniclabs.com',
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 64165,
-      gasPrice: 1000000000, // 1 gwei
+      url: 'https://rpc.testnet.soniclabs.com', // Correct Sonic Testnet RPC
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 14601, // Correct Sonic Testnet Chain ID
+      gasPrice: 20000000000, // 20 gwei - increased gas price
     },
   },
   solidity: {

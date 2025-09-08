@@ -3,12 +3,7 @@
 import * as React from 'react'
 import { WagmiConfig, configureChains, createConfig } from 'wagmi'
 import { RainbowKitProvider, connectorsForWallets, darkTheme } from '@rainbow-me/rainbowkit'
-import {
-  metaMaskWallet,
-  trustWallet,
-  coinbaseWallet,
-  rainbowWallet,
-} from '@rainbow-me/rainbowkit/wallets'
+import { metaMaskWallet, coinbaseWallet, rainbowWallet } from '@rainbow-me/rainbowkit/wallets'
 import { sepolia } from 'wagmi/chains'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
@@ -33,7 +28,7 @@ const sonic = {
 }
 
 const sonicTestnet = {
-  id: 64165,
+  id: 14601, // Correct Sonic Testnet Chain ID
   name: 'Sonic Testnet',
   network: 'sonic-testnet',
   nativeCurrency: {
@@ -42,8 +37,8 @@ const sonicTestnet = {
     symbol: 'S',
   },
   rpcUrls: {
-    public: { http: ['https://rpc.blaze.soniclabs.com'] },
-    default: { http: ['https://rpc.blaze.soniclabs.com'] },
+    public: { http: ['https://rpc.testnet.soniclabs.com'] }, // Correct Sonic Testnet RPC
+    default: { http: ['https://rpc.testnet.soniclabs.com'] },
   },
   blockExplorers: {
     default: { name: 'SonicTestnetExplorer', url: 'https://testnet.soniclabs.com' },
@@ -63,8 +58,7 @@ const connectors = connectorsForWallets([
     groupName: 'Recommended',
     wallets: [
       metaMaskWallet({ projectId, chains }),
-      trustWallet({ projectId, chains }),
-      coinbaseWallet({ appName: 'Coinbase', chains }),
+      coinbaseWallet({ appName: 'VaultMotors', chains }),
       rainbowWallet({ projectId, chains }),
     ],
   },
