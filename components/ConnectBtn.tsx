@@ -1,4 +1,4 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import Image from 'next/image'
 import React from 'react'
 import { motion } from 'framer-motion'

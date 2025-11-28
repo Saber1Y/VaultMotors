@@ -1,14 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { WagmiConfig, configureChains, createConfig } from 'wagmi'
-import { RainbowKitProvider, connectorsForWallets, darkTheme } from '@rainbow-me/rainbowkit'
-import { metaMaskWallet, coinbaseWallet, rainbowWallet } from '@rainbow-me/rainbowkit/wallets'
-import { sepolia } from 'wagmi/chains'
-import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
+import { PrivyProvider } from '@privy-io/react-auth'
+import { WagmiProvider } from '@privy-io/wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { sepolia, mainnet, polygon } from 'viem/chains'
 
-// Define Sonic chains
+// Define Sonic chains for Privy
 const sonic = {
   id: 146,
   name: 'Sonic',
@@ -25,10 +23,10 @@ const sonic = {
   blockExplorers: {
     default: { name: 'SonicExplorer', url: 'https://soniclabs.com' },
   },
-}
+} as const
 
 const sonicTestnet = {
-  id: 14601, // Correct Sonic Testnet Chain ID
+  id: 14601,
   name: 'Sonic Testnet',
   network: 'sonic-testnet',
   nativeCurrency: {
@@ -37,52 +35,49 @@ const sonicTestnet = {
     symbol: 'S',
   },
   rpcUrls: {
-    public: { http: ['https://rpc.testnet.soniclabs.com'] }, // Correct Sonic Testnet RPC
+    public: { http: ['https://rpc.testnet.soniclabs.com'] },
     default: { http: ['https://rpc.testnet.soniclabs.com'] },
   },
   blockExplorers: {
     default: { name: 'SonicTestnetExplorer', url: 'https://testnet.soniclabs.com' },
   },
   testnet: true,
-}
+} as const
 
-const { chains, publicClient } = configureChains(
-  [sepolia, sonicTestnet, sonic], // Include Sepolia for cross-chain testing
-  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID as string }), publicProvider()]
-)
+// Create a query client for react-query
+const queryClient = new QueryClient()
 
-const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
-
-const connectors = connectorsForWallets([
-  {
-    groupName: 'Recommended',
-    wallets: [
-      metaMaskWallet({ projectId, chains }),
-      coinbaseWallet({ appName: 'VaultMotors', chains }),
-      rainbowWallet({ projectId, chains }),
-    ],
+// Privy configuration
+const privyConfig = {
+  loginMethods: ['email', 'wallet'],
+  appearance: {
+    theme: 'dark' as const,
+    accentColor: '#3b82f6',
+    logo: '/images/assets/hero-banner.png',
   },
-])
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-})
-
-const demoAppInfo = {
-  appName: 'VaultMotors - Sonic Powered Car Marketplace',
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets' as const,
+    noPromptOnSignature: false,
+  },
 }
+
+// Supported chains for the app
+const supportedChains = [sepolia, sonicTestnet, sonic, mainnet, polygon]
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
 
+  if (!mounted) return null
+
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider theme={darkTheme()} chains={chains} appInfo={demoAppInfo}>
-        {mounted && children}
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <PrivyProvider
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || 'your-privy-app-id'}
+      config={privyConfig}
+    >
+      <QueryClientProvider client={queryClient}>
+        <WagmiProvider>{children}</WagmiProvider>
+      </QueryClientProvider>
+    </PrivyProvider>
   )
 }
