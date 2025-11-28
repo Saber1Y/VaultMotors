@@ -22,8 +22,7 @@ import {
 } from 'react-icons/fa'
 import { getCar, purchaseCarFromChain, deleteCar } from '@/services/blockchain'
 import { CarStruct, CarCondition, CarTransmission, FuelType } from '@/utils/type.dt'
-import { useAccount, useConnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+import { useWalletConnection } from '@/hooks/useWalletConnection'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
 import { toast } from 'react-toastify'
@@ -52,10 +51,7 @@ const CarDetailsPage = () => {
   const [car, setCar] = useState<CarStruct | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  })
+  const { walletAddress, isAuthenticated, connectExternalWallet } = useWalletConnection()
   const [isOpen, setIsOpen] = useState(false)
   const [showTransferModal, setShowTransferModal] = useState(false)
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)

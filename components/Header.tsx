@@ -1,15 +1,15 @@
 import Link from 'next/link'
-import ConnectBtn from './ConnectBtn'
+import { WalletConnect } from './ConnectBtn'
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CgMenuLeft } from 'react-icons/cg'
 import { FaTimes, FaCar } from 'react-icons/fa'
-import { useAccount } from 'wagmi'
+import { useWalletConnection } from '@/hooks/useWalletConnection'
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [scrolled, setScrolled] = useState<boolean>(false)
-  const { address } = useAccount()
+  const { walletAddress } = useWalletConnection()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,8 +24,8 @@ const Header: React.FC = () => {
     { href: '/cars', label: 'Marketplace' },
     { href: '/brands', label: 'Brands' },
     { href: '/sales-history', label: 'Sales History' },
-    ...(address ? [{ href: '/cars/list', label: 'Sell Your Car' }] : []),
-    ...(address ? [{ href: '/myListings', label: 'My Listings' }] : []),
+    ...(walletAddress ? [{ href: '/cars/list', label: 'Sell Your Car' }] : []),
+    ...(walletAddress ? [{ href: '/myListings', label: 'My Listings' }] : []),
   ]
 
   return (
@@ -74,7 +74,7 @@ const Header: React.FC = () => {
           </nav>
 
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <ConnectBtn networks />
+            <WalletConnect />
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
                 </div>
               </div>
               <div className="py-6 px-5 space-y-6">
-                <ConnectBtn />
+                <WalletConnect />
               </div>
             </div>
           </motion.div>

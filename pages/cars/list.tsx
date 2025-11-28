@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { useAccount } from 'wagmi'
+import { useWalletConnection } from '@/hooks/useWalletConnection'
 import { motion } from 'framer-motion'
 import { FaPlus, FaTimes, FaUser, FaCamera, FaEthereum, FaCar } from 'react-icons/fa'
 import Image from 'next/image'
@@ -15,7 +15,7 @@ const getRandomAvatar = () => avatars[Math.floor(Math.random() * avatars.length)
 
 const ListCarPage = () => {
   const router = useRouter()
-  const { address } = useAccount()
+  const { walletAddress } = useWalletConnection()
   const [loading, setLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [featureInput, setFeatureInput] = useState('')
@@ -46,7 +46,7 @@ const ListCarPage = () => {
       features: [],
     },
     sellerDetails: {
-      wallet: address || '',
+      wallet: walletAddress || '',
       sellerName: '',
       email: '',
       phoneNumber: 0,
@@ -104,7 +104,7 @@ const ListCarPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!address) {
+    if (!walletAddress) {
       toast.error('Please connect your wallet first')
       return
     }
@@ -124,7 +124,7 @@ const ListCarPage = () => {
         },
         sellerDetails: {
           ...formData.sellerDetails,
-          wallet: address || '', // Always use connected wallet
+          wallet: walletAddress || '', // Always use connected wallet
         },
         destinationChainId: 11155111, // Sepolia chain ID
         paymentToken: ethers.ZeroAddress, // Use ethers.ZeroAddress instead of string

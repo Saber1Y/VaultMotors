@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { WalletConnect } from './ConnectBtn'
 import Link from 'next/link'
 import { FaSearch, FaCar } from 'react-icons/fa'
-import { useAccount } from 'wagmi'
+import { useWalletConnection } from '@/hooks/useWalletConnection'
 
 const Hero = () => {
-  const { address } = useAccount()
+  const { walletAddress } = useWalletConnection()
 
   return (
     <div className="relative min-h-screen">
