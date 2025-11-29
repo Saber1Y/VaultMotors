@@ -46,7 +46,7 @@ const ListCarPage = () => {
       features: [],
     },
     sellerDetails: {
-      wallet: walletAddress || '',
+      wallet: address || '',
       sellerName: '',
       email: '',
       phoneNumber: 0,
@@ -104,7 +104,7 @@ const ListCarPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!walletAddress) {
+    if (!address) {
       toast.error('Please connect your wallet first')
       return
     }
@@ -124,7 +124,7 @@ const ListCarPage = () => {
         },
         sellerDetails: {
           ...formData.sellerDetails,
-          wallet: walletAddress || '', // Always use connected wallet
+          wallet: address || '', // Always use connected wallet
         },
         destinationChainId: 11155111, // Sepolia chain ID
         paymentToken: ethers.ZeroAddress, // Use ethers.ZeroAddress instead of string

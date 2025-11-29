@@ -133,7 +133,7 @@ const EditCarPage = () => {
 
   const handleAddFeature = () => {
     if (featureInput.trim()) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         additionalInfo: {
           ...prev.additionalInfo,
@@ -145,7 +145,7 @@ const EditCarPage = () => {
   }
 
   const handleRemoveFeature = (index: number) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       additionalInfo: {
         ...prev.additionalInfo,
@@ -171,9 +171,7 @@ const EditCarPage = () => {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-20">Loading...</div>
-    )
+    return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-20">Loading...</div>
   }
 
   return (
@@ -201,12 +199,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, name: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, name: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter car name"
                   required
@@ -217,12 +213,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.make}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, make: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, make: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter car make"
                   required
@@ -233,12 +227,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.model}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, model: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, model: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter car model"
                   required
@@ -249,12 +241,10 @@ const EditCarPage = () => {
                 <input
                   type="number"
                   value={formData.basicDetails.year.toString()}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, year: Number(e.target.value) },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, year: Number(e.target.value) },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter year"
                   required
@@ -265,12 +255,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.basicDetails.vin}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, vin: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, vin: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter VIN"
                   required
@@ -280,12 +268,10 @@ const EditCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
                 <textarea
                   value={formData.basicDetails.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      basicDetails: { ...prev.basicDetails, description: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basicDetails: { ...prev.basicDetails, description: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white h-32"
                   placeholder="Enter vehicle description"
                   required
@@ -303,15 +289,13 @@ const EditCarPage = () => {
                   type="number"
                   step="0.001"
                   value={formData.technicalDetails.price.toString()}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      technicalDetails: {
-                        ...prev.technicalDetails,
-                        price: e.target.value,
-                      },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    technicalDetails: { 
+                      ...prev.technicalDetails, 
+                      price: e.target.value 
+                    },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter price in ETH"
                   required
@@ -322,15 +306,10 @@ const EditCarPage = () => {
                 <input
                   type="number"
                   value={formData.technicalDetails.mileage.toString()}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      technicalDetails: {
-                        ...prev.technicalDetails,
-                        mileage: Number(e.target.value),
-                      },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    technicalDetails: { ...prev.technicalDetails, mileage: Number(e.target.value) },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter mileage"
                   required
@@ -341,12 +320,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.technicalDetails.color}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      technicalDetails: { ...prev.technicalDetails, color: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    technicalDetails: { ...prev.technicalDetails, color: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter color"
                   required
@@ -356,15 +333,10 @@ const EditCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Condition</label>
                 <select
                   value={formData.technicalDetails.condition}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      technicalDetails: {
-                        ...prev.technicalDetails,
-                        condition: Number(e.target.value),
-                      },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    technicalDetails: { ...prev.technicalDetails, condition: Number(e.target.value) },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   required
                 >
@@ -377,15 +349,10 @@ const EditCarPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-2">Transmission</label>
                 <select
                   value={formData.technicalDetails.transmission}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      technicalDetails: {
-                        ...prev.technicalDetails,
-                        transmission: Number(e.target.value),
-                      },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    technicalDetails: { ...prev.technicalDetails, transmission: Number(e.target.value) },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   required
                 >
@@ -404,12 +371,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.additionalInfo.location}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      additionalInfo: { ...prev.additionalInfo, location: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    additionalInfo: { ...prev.additionalInfo, location: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter location"
                   required
@@ -435,10 +400,7 @@ const EditCarPage = () => {
                 </div>
                 <div className="mt-2 space-y-2">
                   {formData.additionalInfo.features.map((feature, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between bg-gray-700/50 rounded-lg px-4 py-2 text-white"
-                    >
+                    <div key={index} className="flex items-center justify-between bg-gray-700/50 rounded-lg px-4 py-2 text-white">
                       <span>{feature}</span>
                       <button
                         type="button"
@@ -462,12 +424,10 @@ const EditCarPage = () => {
                 <input
                   type="text"
                   value={formData.sellerDetails.sellerName}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      sellerDetails: { ...prev.sellerDetails, sellerName: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    sellerDetails: { ...prev.sellerDetails, sellerName: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your name"
                   required
@@ -478,12 +438,10 @@ const EditCarPage = () => {
                 <input
                   type="email"
                   value={formData.sellerDetails.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      sellerDetails: { ...prev.sellerDetails, email: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    sellerDetails: { ...prev.sellerDetails, email: e.target.value },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your email"
                   required
@@ -494,21 +452,17 @@ const EditCarPage = () => {
                 <input
                   type="tel"
                   value={formData.sellerDetails.phoneNumber.toString()}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      sellerDetails: { ...prev.sellerDetails, phoneNumber: Number(e.target.value) },
-                    }))
-                  }
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    sellerDetails: { ...prev.sellerDetails, phoneNumber: Number(e.target.value) },
+                  }))}
                   className="w-full bg-gray-700/50 rounded-lg px-4 py-2 text-white"
                   placeholder="Enter your phone number"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  Wallet Address
-                </label>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Wallet Address</label>
                 <input
                   type="text"
                   value={formData.sellerDetails.wallet}

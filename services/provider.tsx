@@ -2,9 +2,10 @@
 
 import * as React from 'react'
 import { PrivyProvider } from '@privy-io/react-auth'
-import { WagmiProvider } from '@privy-io/wagmi'
+import { WagmiProvider, createConfig } from '@privy-io/wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { sepolia, mainnet, polygon } from 'viem/chains'
+import { http } from 'viem'
 
 // Define Sonic chains for Privy
 const sonic = {
@@ -47,6 +48,18 @@ const sonicTestnet = {
 // Create a query client for react-query
 const queryClient = new QueryClient()
 
+// Create wagmi config for Privy
+const wagmiConfig = createConfig({
+  chains: [sepolia, sonicTestnet, sonic, mainnet, polygon],
+  transports: {
+    [sepolia.id]: http(),
+    [sonicTestnet.id]: http(),
+    [sonic.id]: http(),
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+  },
+})
+
 // Privy configuration
 const privyConfig = {
   loginMethods: ['email', 'wallet'],
@@ -61,9 +74,6 @@ const privyConfig = {
   },
 }
 
-// Supported chains for the app
-const supportedChains = [sepolia, sonicTestnet, sonic, mainnet, polygon]
-
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
@@ -72,11 +82,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || 'your-privy-app-id'}
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || 'clzhrmzq4069014o6ipzx63u3'}
       config={privyConfig}
     >
       <QueryClientProvider client={queryClient}>
-        <WagmiProvider>{children}</WagmiProvider>
+        <WagmiProvider config={wagmiConfig}>
+          {children}
+        </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   )
